@@ -33,10 +33,6 @@
       $('.nav li').click(function(){
         var index = $(this).index();
 
-       $('.nav li').removeClass('active');  
-       $(this).addClass('active');
-        
-        
         $('.contents li').hide();
         $('.contents li').eq(index).show();  
          });
