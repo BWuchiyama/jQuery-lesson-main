@@ -26,16 +26,14 @@
   `
 
   let encountHtml =
-  `
-    <p class="name"></p>
-    <div>
-      <img class="img" src="" alt="">
-    </div>
-    <div>
-      <button class="btn" id="catch">捕まえる</button>
-      <button class="btn" data-js="reset">逃げる</button>
-    </div>
-  `
+`
+  <p class="name"></p>
+  <div class="img-area"></div>
+  <div>
+    <button class="btn" id="catch">捕まえる</button>
+    <button class="btn" data-js="reset">逃げる</button>
+  </div>
+`
 
   let doneHtml =
   `
@@ -47,39 +45,52 @@
   `
 
   // ① ポケモンを探す
-  $(document).on('click', '#pokemon_search', function(){
+$(document).on('click', '#pokemon_search', function(){
 
-     var randomId = Math.floor(Math.random() * 151) + 1;
+  const randomId = Math.floor(Math.random() * 151) + 1;
 
-  $.get('https://pokeapi.co/api/v2/pokemon/' + randomId, function(data){
+ $.ajax({
+  url: `https://pokeapi.co/api/v2/pokemon-species/${randomId}`,
+  method: 'GET'
 
-      var name = data.name;
-      var img = data.sprites.front_default;
+}).done(function(res){
 
-      $('.wrapper').html(encountHtml);
+$('.wrapper').html(encountHtml);
 
-      $('.name').text(name + ' が現れた！');
-      $('.img').attr('src', img);
+  const jpName = res.names.find(function(item){
+    return item.language.name === 'ja';
+  }).name;
 
-    });
+  const img =
+  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+  randomId +
+  '.png';
 
-  });
+  $('.img-area').html('<img class="img" src="' + img + '">');
+  $('.name').text(jpName + ' が現れた！');
+
+}).fail(function(){
+
+  alert('取得失敗');
+
+});
+
+});
 
   // ② 捕まえる
   $(document).on('click', '#catch', function(){
 
-    var result = Math.random();
+    const result = Math.random();
 
     if(result < 0.5){
       // 成功
-      $.get('https://pokeapi.co/api/v2/item/4', function(data){
 
-        var ballImg = data.sprites.default;
+       const  ballImg = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';
+
 
         $('.wrapper').html(doneHtml);
         $('.img').attr('src', ballImg);
-
-      });
+      
 
     } else {
       // 失敗
@@ -91,7 +102,7 @@
   // ③ 戻る・逃げる
   $(document).on('click', '[data-js="reset"]', function(){
 
-    var startHtml =
+   const startHtml =
       '<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>';
 
     $('.wrapper').html(startHtml);
@@ -100,6 +111,6 @@
 
 });
    
-  </script>
+</script>
 </body>
 </html>
